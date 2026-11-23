@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #121212;
+        }
+        .calculator {
+            background: #1e1e2e;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            width: 380px;
+            max-width: 95%;
+        }
+        .mode-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            color: #a6adc8;
+            font-size: 13px;
+        }
+        .mode-btn {
+            background: #313244;
+            color: #cdd6f4;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .display {
+            width: 100%;
+            background: #11111b;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: right;
+            border: 1px solid #313244;
+        }
+        #history {
+            color: #7f849c;
+            font-size: 14px;
+            min-height: 20px;
+            overflow-x: auto;
+        }
+        #screen {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 28px;
+            text-align: right;
+            outline: none;
+            margin-top: 5px;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+        button {
+            padding: 14px 5px;
+            font-size: 15px;
+            border: none;
+            border-radius: 8px;
+            background: #313244;
+            color: #cdd6f4;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        button:hover {
+            background: #45475a;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .sci {
+            background: #252637;
+            color: #89b4fa;
+            font-size: 14px;
+        }
+        .op {
+            background: #3b3d54;
+            color: #f9e2af;
+            font-weight: bold;
+        }
+        .clear {
+            background: #f38ba8;
+            color: #11111b;
+            font-weight: bold;
+        }
+        .equal {
+            background: #a6e3a1;
+            color: #11111b;
+            font-weight: bold;
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <div class="mode-bar">
+        <span>SCIENTIFIC</span>
+        <button class="mode-btn" id="angleMode" onclick="toggleMode()">DEG</button>
+    </div>
+    <div class="display">
+        <div id="history"></div>
+        <input type="text" id="screen" readonly placeholder="0">
+    </div>
+    <div class="buttons">
+        <!-- Row 1 -->
+        <button class="sci" onclick="appendFunc('sin(')">sin</button>
+        <button class="sci" onclick="appendFunc('cos(')">cos</button>
+        <button class="sci" onclick="appendFunc('tan(')">tan</button>
+        <button class="clear" onclick="clearAll()">AC</button>
+        <button class="clear" onclick="backspace()">DEL</button>
+
+        <!-- Row 2 -->
+        <button class="sci" onclick="appendFunc('asin(')">sin⁻¹</button>
+        <button class="sci" onclick="appendFunc('acos(')">cos⁻¹</button>
+        <button class="sci" onclick="appendFunc('atan(')">tan⁻¹</button>
+        <button class="sci" onclick="appendValue('(')">(</button>
+        <button class="sci" onclick="appendValue(')')">)</button>
+
+        <!-- Row 3 -->
+        <button class="sci" onclick="appendFunc('log(')">log</button>
+        <button class="sci" onclick="appendFunc('ln(')">ln</button>
+        <button class="sci" onclick="appendValue('^')">xʸ</button>
+        <button class="sci" onclick="appendFunc('sqrt(')">√</button>
+        <button class="sci" onclick="appendValue('!')">n!</button>
+
+        <!-- Row 4 -->
+        <button class="sci" onclick="appendValue('π')">π</button>
+        <button onclick="appendValue('7')">7</button>
+        <button onclick="appendValue('8')">8</button>
+        <button onclick="appendValue('9')">9</button>
+        <button class="op" onclick="appendValue('/')">÷</button>
+
+        <!-- Row 5 -->
+        <button class="sci" onclick="appendValue('e')">e</button>
+        <button onclick="appendValue('4')">4</button>
+        <button onclick="appendValue('5')">5</button>
+        <button onclick="appendValue('6')">6</button>
+        <button class="op" onclick="appendValue('*')">×</button>
+
+        <!-- Row 6 -->
+        <button class="sci" onclick="appendValue('%')">%</button>
+        <button onclick="appendValue('1')">1</button>
+        <button onclick="appendValue('2')">2</button>
+        <button onclick="appendValue('3')">3</button>
+        <button class="op" onclick="appendValue('-')">−</button>
+
+        <!-- Row 7 -->
+        <button onclick="appendValue('0')">0</button>
+        <button onclick="appendValue('.')">.</button>
+        <button class="equal" onclick="calculate()">=</button>
+        <button class="op" onclick="appendValue('+')">+</button>
+    </div>
+</div>
+
+<script>
+    const screen = document.getElementById('screen');
+    const history = document.getElementById('history');
+    const angleBtn = document.getElementById('angleMode');
+    let isDegree = true;
+
+    function toggleMode() {
+        isDegree = !isDegree;
+        angleBtn.innerText = isDegree ? 'DEG' : 'RAD';
+    }
+
+    function appendValue(val) {
+        if (screen.value === 'Error') screen.value = '';
+        screen.value += val;
+    }
+
+    function appendFunc(func) {
+        if (screen.value === 'Error') screen.value = '';
+        screen.value += func;
+    }
+
+    function clearAll() {
+        screen.value = '';
+        history.innerText = '';
+    }
+
+    function backspace() {
+        if (screen.value === 'Error') {
+            screen.value = '';
+            return;
+        }
+        screen.value = screen.value.slice(0, -1);
+    }
+
+    function factorial(n) {
+        if (n < 0 || !Number.isInteger(n)) return NaN;
+        if (n === 0 || n === 1) return 1;
+        let res = 1;
+        for (let i = 2; i <= n; i++) res *= i;
+        return res;
+    }
+
+    function calculate() {
+        try {
+            let expr = screen.value;
+            if (!expr) return;
+            history.innerText = expr + ' =';
+
+            // Replace constants and operators
+            expr = expr.replace(/π/g, 'Math.PI');
+            expr = expr.replace(/\be\b/g, 'Math.E');
+            expr = expr.replace(/\^/g, '**');
+            expr = expr.replace(/sqrt\(/g, 'Math.sqrt(');
+            expr = expr.replace(/log\(/g, 'Math.log10(');
+            expr = expr.replace(/ln\(/g, 'Math.log(');
+            expr = expr.replace(/(\d+)!/g, 'factorial($1)');
+            expr = expr.replace(/%/g, '/100');
+
+            // Handle Trig functions (Degree vs Radian)
+            const toRad = isDegree ? '*(Math.PI/180)' : '';
+            const toDeg = isDegree ? '*(180/Math.PI)' : '';
+
+            expr = expr.replace(/asin\(([^)]+)\)/g, `(Math.asin($1)${toDeg})`);
+            expr = expr.replace(/acos\(([^)]+)\)/g, `(Math.acos($1)${toDeg})`);
+            expr = expr.replace(/atan\(([^)]+)\)/g, `(Math.atan($1)${toDeg})`);
+            expr = expr.replace(/sin\(([^)]+)\)/g, `Math.sin(($1)${toRad})`);
+            expr = expr.replace(/cos\(([^)]+)\)/g, `Math.cos(($1)${toRad})`);
+            expr = expr.replace(/tan\(([^)]+)\)/g, `Math.tan(($1)${toRad})`);
+
+            let result = eval(expr);
+            // Fix floating point precision issues (e.g., sin(30) = 0.49999999999999994)
+            result = Math.round(result * 1e12) / 1e12;
+            screen.value = isNaN(result) ? 'Error' : result;
+        } catch (e) {
+            screen.value = 'Error';
+        }
+    }
+
+    // Keyboard Support
+    document.addEventListener('keydown', (e) => {
+        if ((e.key >= '0' && e.key <= '9') || ['+', '-', '*', '/', '.', '(', ')', '^', '%'].includes(e.key)) {
+            appendValue(e.key);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            calculate();
+        } else if (e.key === 'Backspace') {
+            backspace();
+        } else if (e.key === 'Escape') {
+            clearAll();
+        }
+    });
+</script>
+
+</body>
+</html>
