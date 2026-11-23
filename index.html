@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scientific Calculator Pro</title>
+    <title>rantimadhu — Scientific Calculator Pro</title>
     <style>
         * {
             box-sizing: border-box;
@@ -27,6 +27,28 @@
             padding: 18px;
             border-radius: 16px;
             box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+        }
+        .brand-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #2e2f42;
+        }
+        .brand-name {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #a6e3a1;
+        }
+        .brand-tag {
+            font-size: 11px;
+            color: #89b4fa;
+            background: #252637;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 600;
         }
         .top-tabs {
             display: grid;
@@ -262,6 +284,11 @@
 <body>
 
 <div class="app-wrapper">
+    <div class="brand-header">
+        <span class="brand-name">rantimadhu</span>
+        <span class="brand-tag">Scientific Calc</span>
+    </div>
+
     <div class="top-tabs">
         <button class="tab-btn active" onclick="switchTab('calcTab', this)">Scientific</button>
         <button class="tab-btn" onclick="switchTab('quadTab', this)">Quadratic</button>
